@@ -1,0 +1,18 @@
+-Kernel Module that interfaces with Virtual Memory System and redirects page
+faults on a specific memory area of a process to a remote process via the
+network.
+
+-Modify linux kernel so networked memory can be mapped to a given process.
+(hint: look at mmap() system call)
+
+-idea is to store pages on the network, filling the tlb with new page
+pointers.
+
+-when the process writes to the particular region, code can flush the new data
+across the network when sync is requested.
+
+-hint: use user-level network API instead of kernel ones.
+
+
+Use the Client-Server Model approach:
+-Communications between clients and servers is done by message passing.
