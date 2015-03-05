@@ -6,3 +6,10 @@ https://gcc.gnu.org/codingconventions.html
 Kernel module that creates memory pages that are mapped to a networked computer.
 
 <b>All non-project related code goes into the test folder, do not put our tests anywhere else, as the project code should remain in a logical directory structure.</b>
+
+Use sockets, message queues, and semaphores. It might also be necesarry to look into shared memory. The reference material came from the Linux Programming Interface.
+
+VMs: Using the Fedora21 Workstation ISO - Please install and setup the network.
+
+For VirtualBox, on your host machine open a console and run this command "VBoxManage dhcpserver add --netname testlab --ip 10.10.10.1 --netmask 255.255.255.0 --lowerip 10.10.10.2 --upperip 10.10.10.12 --enable". Next open the Vbox gui and click on settings for each VM then go to the network tab and choose "internal network". Change "intnet" to "testlab".
+
