@@ -13,3 +13,4 @@ VMs: Using the Fedora21 Workstation ISO - Please install and setup the network.
 
 For VirtualBox, on your host machine open a console and run this command "VBoxManage dhcpserver add --netname testlab --ip 10.10.10.1 --netmask 255.255.255.0 --lowerip 10.10.10.2 --upperip 10.10.10.12 --enable". Next open the Vbox gui and click on settings for each VM then go to the network tab and choose "internal network". Change "intnet" to "testlab".
 
+All client related code should stay in the client side and all server related code should stay server side there will be overlap, but let's develop the two seperately for added flexibility.
