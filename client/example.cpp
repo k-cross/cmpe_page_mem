@@ -34,7 +34,7 @@ int main ()
 
       //Now test it reading the file
       std::filebuf fbuf;
-      fbuf.open("file.bin", std::ios_base::in | std::ios_base::binary); 
+      fbuf.open("../server/file.bin", std::ios_base::in | std::ios_base::binary); 
 
       //Read it to memory
       std::vector<char> vect(region.get_size(), 0);
@@ -52,10 +52,10 @@ int main ()
       std::cout << "Test successful!" << std::endl;
    }
    catch(interprocess_exception &ex){
-      std::remove("file.bin");
+      std::remove("../server/file.bin");
       std::cout << "Unexpected exception: " << ex.what() << std::endl;
       return 1;
    }
-   std::remove("file.bin");
+   std::remove("../server/file.bin");
    return 0;
 }
