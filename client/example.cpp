@@ -11,7 +11,7 @@ int main ()
    using namespace boost::interprocess;
    try{
       //Open the file mapping
-      file_mapping m_file ("file.bin", read_only);
+      file_mapping m_file ("../server/file.bin", read_only);
 
       //Map the whole file in this process
       mapped_region region
