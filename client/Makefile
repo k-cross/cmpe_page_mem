@@ -1,2 +1,2 @@
 all:
-	g++ -g example.cpp -o client
+	g++ -g tcp_boostcl.cpp -lpthread -lboost_system -o client
