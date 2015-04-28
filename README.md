@@ -1,9 +1,6 @@
 # Networked Paging
 Kernel module that creates memory pages that are mapped to a networked computer.
 
-Please use [GNU Coding Conventions](https://gcc.gnu.org/codingconventions.html)
-for C that way we don't have to argue.
-
 **All non-project related code goes into the test folder, do not put our tests anywhere else, as the project code should remain in a logical directory structure.**
 
 Use sockets, message queues, and semaphores. It might also be necessary to look into shared memory. The reference material came from the Linux Programming Interface.

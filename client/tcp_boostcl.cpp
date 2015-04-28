@@ -4,18 +4,17 @@
  * <Matter> Boost libraries used for tcp communication with client
  */
 
+//This is currently just a boost example
+
 #include <iostream>
 #include <boost/array.hpp>
 #include <boost/asio.hpp>
 
 using boost::asio::ip::tcp;
 
-int main(int argc, char* argv[])
-{
-  try
-  {
-    if (argc != 2)
-    {
+int main(int argc, char* argv[]){
+  try{
+    if (argc != 2){
       std::cerr << "Usage: client <host>" << std::endl;
       return 1;
     }
@@ -29,8 +28,7 @@ int main(int argc, char* argv[])
     tcp::socket socket(io_service);
     boost::asio::connect(socket, endpoint_iterator);
 
-    for (;;)
-    {
+    for (;;){
       boost::array<char, 128> buf;
       boost::system::error_code error;
 
@@ -44,8 +42,7 @@ int main(int argc, char* argv[])
       std::cout.write(buf.data(), len);
     }
   }
-  catch (std::exception& e)
-  {
+  catch (std::exception& e){
     std::cerr << e.what() << std::endl;
   }
 

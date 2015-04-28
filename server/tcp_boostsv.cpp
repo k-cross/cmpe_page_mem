@@ -4,6 +4,7 @@
  * <Matter> Boost libraries used for tcp communication with server
  */
 
+//This is currently just a boost example
 
 #include <ctime>
 #include <iostream>
@@ -12,23 +13,20 @@
 
 using boost::asio::ip::tcp;
 
-std::string make_daytime_string()
-{
+std::string make_daytime_string(){
   using namespace std; // For time_t, time and ctime;
   time_t now = time(0);
   return ctime(&now);
 }
 
-int main()
-{
-  try
-  {
+int main(){
+  try{
     boost::asio::io_service io_service;
 
-    tcp::acceptor acceptor(io_service, tcp::endpoint(tcp::v4(), 13));
+    //listens on port 6666
+    tcp::acceptor acceptor(io_service, tcp::endpoint(tcp::v4(), 6666));
 
-    for (;;)
-    {
+    for (;;){
       tcp::socket socket(io_service);
       acceptor.accept(socket);
 
@@ -38,8 +36,7 @@ int main()
       boost::asio::write(socket, boost::asio::buffer(message), ignored_error);
     }
   }
-  catch (std::exception& e)
-  {
+  catch (std::exception& e){
     std::cerr << e.what() << std::endl;
   }
 
