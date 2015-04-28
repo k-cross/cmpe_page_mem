@@ -29,7 +29,7 @@ public:
   }
 
   void start(){
-    message_ = "this\n";
+    message_ = "Initial Server Connection Established\n";
 
     boost::asio::async_write(socket_, boost::asio::buffer(message_),
         boost::bind(&tcp_connection::handle_write, shared_from_this(),
