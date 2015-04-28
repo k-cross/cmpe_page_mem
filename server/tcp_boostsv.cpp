@@ -2,11 +2,11 @@
  * <Author> Kenneth Cross
  * <Date> 04/27/2015
  * <Matter> Boost libraries used for tcp communication with server
+ *
+ * Constants are in CAPS
+ * Member Functions contain trailing _
  */
 
-//This is currently just a boost example
-
-#include <ctime>
 #include <iostream>
 #include <string>
 #include <boost/bind.hpp>
@@ -15,12 +15,6 @@
 #include <boost/asio.hpp>
 
 using boost::asio::ip::tcp;
-
-std::string make_daytime_string(){
-  using namespace std; // For time_t, time and ctime;
-  time_t now = time(0);
-  return ctime(&now);
-}
 
 class tcp_connection : public boost::enable_shared_from_this<tcp_connection>{
 public:
@@ -35,7 +29,7 @@ public:
   }
 
   void start(){
-    message_ = make_daytime_string();
+    message_ = "this\n";
 
     boost::asio::async_write(socket_, boost::asio::buffer(message_),
         boost::bind(&tcp_connection::handle_write, shared_from_this(),
@@ -84,16 +78,3 @@ private:
 
   tcp::acceptor acceptor_;
 };
-
-int main(){
-  try{
-    boost::asio::io_service io_service;
-    tcp_server server(io_service);
-    io_service.run();
-  }
-  catch (std::exception& e){
-    std::cerr << e.what() << std::endl;
-  }
-
-  return 0;
-}

@@ -1,2 +1,2 @@
 all:
-	g++ -g tcp_boostsv.cpp -lpthread -lboost_system -o server
+	g++ -g main.cpp tcp_boostsv.cpp -lpthread -lboost_system -o server
