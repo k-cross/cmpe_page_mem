@@ -15,10 +15,11 @@ int main(int argc, char* argv[]){
         std::cerr << "Usage: " << argv[0] << " <server-address> <file path>" << std::endl;
         return __LINE__;
     }
+
     for(;;){
         try{
             boost::asio::io_service io_service;
-            async_tcp_client client(io_service, argv[1], argv[2]);
+            async_tcp_client client(io_service, serv, path);
             io_service.run();
 
             std::cout << "send file " << argv[2] << " completed successfully.\n";

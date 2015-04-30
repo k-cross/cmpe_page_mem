@@ -16,8 +16,10 @@ void* r_addr = (int*)0xaaaa;
 int r_len = 0x4000;
 char value[25];
 
-void* __attribute__((weak)) mmap(void *addrs, size_t lengths, int prots, int flag, int fds){
 
+void* __attribute__((weak)) mmap(void *addrs, 
+    size_t lengths, int prots, int flag, int fds, void* r_addr)
+{
 	void* nu = 0;
 	if(addrs == r_addr){
 		cout << "Potential Page or Segmentation Fault detected!" << endl;
@@ -38,7 +40,7 @@ size_t getFilesize(const char* filename) {
     return st.st_size;
 }
 
-void r_mapHandler(int signum){
+void r_mapHandler(int signum, char value[25]){
 
 	cout << "Sending Value: " << value << " to be mapped into Remote Memory" << endl;
 
@@ -46,7 +48,6 @@ void r_mapHandler(int signum){
 	cout << "\n**SHIOULD NOW SEND TO SERVER (DEBUG)**" << endl;
 
 }
-
 
 int main(int argc, char** argv) {
 
