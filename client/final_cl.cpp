@@ -1,3 +1,6 @@
+//Client
+//Dont forget to STD::REMOVE("MESSAGE") in server
+
 #include <sys/mman.h>
 #include <sys/types.h>
 #include <fcntl.h>
@@ -43,14 +46,18 @@ size_t getFilesize(const char* filename) {
     return st.st_size;
 }
 
-void r_mapHandler(int signum, std::string server, std::string path){
+void r_mapHandler(int signum){
     std::string more = "n";
 
 	cout << "Sending Value: " << value << " to be mapped into Remote Memory" << endl;
 
 	// ********************VALUE SENT TO SERVER*******************
     for(;;){
-	    cout << "\n**SHOULD NOW SEND TO SERVER (DEBUG)**" << endl;
+        std::string server = "";
+        std::string path = "";
+	    cout << "\n**SHOULD NOW SEND TO SERVER (DEBUG)**\n";
+        cout << "Server IP: "; cin >> server;
+        cout << "Path: "; cin >> path;
         try{
             boost::asio::io_service io_service;
             async_tcp_client client(io_service, server, path);
@@ -69,11 +76,6 @@ void r_mapHandler(int signum, std::string server, std::string path){
             break;
     }
 }
-
-/* The real fun starts here!
- *
- * Main
- */
 
 int main(int argc, char** argv) {
     std::string server = argv[1];
@@ -145,6 +147,48 @@ int main(int argc, char** argv) {
 		if(opt == 2){
 			cout << "Sync Request Sent to server..." << endl;
 			// **********TODO Send Sync request to Server*********************
+            // **********WORKING*********************
+
+            ofstream outputFile("message");
+            outputFile << "sync";
+            outputFile.close();
+
+            try{
+                boost::asio::io_service io_service;
+                async_tcp_client client(io_service, server, path);
+                io_service.run();
+
+                std::cout << "send file " << path << " completed successfully.\n";
+            }
+            catch (std::exception& e){
+                std::cerr << e.what() << std::endl;
+            }
+
+            std::remove("message");
+
+            std::string tcp_port = "6666";
+            std::string more = "n";
+            int tcpp = 6666;
+
+            for(;;){
+                try{
+                    std::cout << argv[0] << " listen on port " << tcp_port << std::endl;
+                    async_tcp_server *recv_file_tcp_server = new async_tcp_server(tcpp);
+                    delete recv_file_tcp_server;
+                }
+
+                catch (std::exception& e){
+                    std::cerr << e.what() << std::endl;
+                }
+
+                std::cout << "Map more memory? 'y' or 'n': ";
+                std::cin >> more;
+
+                if(more == "n"){
+                    break;
+                }
+            }
+
 
 			//wait
 			cout << " \n**VALUES AND ADDRESSES FROM SERVER SHOULD BE HERE! (DEBUG)**\n\n"; 

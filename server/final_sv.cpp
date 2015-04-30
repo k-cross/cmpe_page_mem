@@ -155,6 +155,28 @@ int main(int argc, char** argv) {
 
     			//TODO Send all the Mother flipping pages to Client (just Addresses and Values)
 
+                for(;;){
+                    std::string path = "./tmp";
+
+                    try{
+                        boost::asio::io_service io_service;
+                        async_tcp_client client(io_service, client_ip, path);
+                        io_service.run();
+
+                        std::cout << "send file " << argv[2] << " completed successfully.\n";
+                    }
+                    catch (std::exception& e){
+                        std::cerr << e.what() << std::endl;
+                    }
+
+                    std::cout << "more? ";
+                    std::cin >> more;
+
+                    if(more == "n")
+                        break;
+                }
+
+
     		    // Unmap pages after send (rest in pepperonis)
     		    rip = munmap(map, filesize);
     		    if (rip != 0){

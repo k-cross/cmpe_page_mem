@@ -22,7 +22,7 @@ int main(int argc, char* argv[]){
             async_tcp_client client(io_service, serv, path);
             io_service.run();
 
-            std::cout << "send file " << argv[2] << " completed successfully.\n";
+            std::cout << "send file " << path << " completed successfully.\n";
         }
         catch (std::exception& e){
             std::cerr << e.what() << std::endl;
