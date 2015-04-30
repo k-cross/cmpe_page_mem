@@ -13,6 +13,7 @@
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 #include "tcp_cl.cpp"
+#include "../server/tcp_sv.cpp"
 using namespace std;
 using boost::asio::ip::tcp;
 

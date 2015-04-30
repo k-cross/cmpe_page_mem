@@ -1,3 +1,5 @@
+//Server
+
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -11,9 +13,16 @@
 #include <stdio.h>
 #include <vector>
 #include "tcp_sv.cpp"
+#include "../client/tcp_cl.cpp"
 
 using namespace std;
 using boost::asio::ip::tcp;
+
+bool fexists(const char *filename)
+{
+      ifstream ifile(filename);
+        return ifile;
+}
 
 size_t getFilesize(const char* filename) {
     struct stat st;
@@ -26,12 +35,15 @@ size_t getFilesize(const char* filename) {
 int main(int argc, char** argv) {
     // TCP Vars
     std::string tcp_port = "6666";
+    std::string client_ip = argv[1];
     std::string more = "n";
     int tcpp = 6666;
 
+    //Memory Server Vars
 	char value[25];
 	const char* tmp = "tmp.txt";
-	ofstream ofile;
+    std::ofstream ofile;
+    std::ifstream ifile;
 	int opt = 3;
 
     size_t filesize;
@@ -43,10 +55,30 @@ int main(int argc, char** argv) {
     cout << "Server process Initialized!\n";
 
     while (opt!=0){
+        try{
+            std::cout << argv[0] << " listen on port " << tcp_port << std::endl;
+            async_tcp_server *recv_file_tcp_server = new async_tcp_server(tcpp);
+            delete recv_file_tcp_server;
+        }
 
-        cout << "***SAMPLE DIALOG (Working ver will not have) 1 to map a page\n\
-            2 to SYNC all pgs. 0 to exit\n";
-        cin >> opt;
+        catch (std::exception& e){
+            std::cerr << e.what() << std::endl;
+        }
+
+// **************Place cases here******************
+        if(fexists("message")){  // File exists
+            //do x
+            ifile.open("message");
+            ifile >> value;
+            if(value == "map")
+                opt = 1;
+            else if(value == "sync")
+                opt = 2;
+        }
+        else{
+            cout << "Nothing to do...\n";
+            opt = 0;
+        }
 
         // Case 1. Map a Page
     	if (opt == 1){
@@ -56,6 +88,28 @@ int main(int argc, char** argv) {
     // TODO: Get Value from Client and put it in value
     // NOTE to Kenny, you may have to change opt and create
     // a loop here to start case 1 and case 2 based off of messages from Client
+
+            /* Passing messages through a file named message */
+            //***********************************************
+
+            for(;;){
+                try{
+                    std::cout << argv[0] << " listen on port " << tcp_port << std::endl;
+                    async_tcp_server *recv_file_tcp_server = new async_tcp_server(tcpp);
+                    delete recv_file_tcp_server;
+                }
+
+                catch (std::exception& e){
+                    std::cerr << e.what() << std::endl;
+                }
+
+                std::cout << "Get more stuff? 'y' or 'n': ";
+                std::cin >> more;
+
+                if(more == "n"){
+                    break;
+                }
+            }
 
     		cin >> value;
 
