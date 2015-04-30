@@ -36,9 +36,8 @@ public:
         request_stream << path << '\n' << file_size << "\n\n";
         std::cout << "Request Size: " << request_.size() << '\n';
 
-        /* Start resolve to translate server and service names
-         * into a list of endpoints
-         */
+        // Start resolve to translate server and service names
+        // into a list of endpoints
 
         tcp::resolver::query query(server_ip, tcp_port);
         resolver_.async_resolve(query, 
@@ -51,9 +50,8 @@ private:
         tcp::resolver::iterator endpoint_iterator)
     {
         if(!err){
-            /* Attempt connection to the first endpoint. Each endpoint
-             * will be tried until a successful connection's made.
-             */
+            // Attempt connection to the first endpoint. Each endpoint
+            // will be tried until a successful connection's made.
 
             tcp::endpoint endpoint = *endpoint_iterator;
             socket_.async_connect(endpoint,
