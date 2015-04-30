@@ -5,6 +5,8 @@
  *
  * Constants are in CAPS
  * Member Functions contain trailing _
+ *
+ * Strings: grab an ip address and something to stream
  */
 
 #include <iostream>
@@ -48,6 +50,7 @@ private:
 
   tcp::socket socket_;
   std::string message_;
+  std::string mem_stream_;
 };
 
 class tcp_server{
@@ -77,4 +80,39 @@ private:
   }
 
   tcp::acceptor acceptor_;
+  std::string ip_addr;
+};
+
+class tcp_query{
+public:
+  tcp_query(boost::asio::io_service& io_service, std::string& ip, std::string& stream);
+  void tcp_setup(){
+    tcp::resolver resolver(io_service);
+    tcp::resolver::query query(ip_addr_, "6666"); /* Port Number or Service Name */
+    tcp::resolver::iterator endpoint_iterator = resolver.resolve(query);
+
+    tcp::socket socket(io_service);
+    boost::asio::connect(socket, endpoint_iterator);
+
+    for (;;){
+      boost::array<char, 128> buf;
+      boost::system::error_code error;
+
+      size_t len = socket.read_some(boost::asio::buffer(buf), error);
+
+      if (error == boost::asio::error::eof)
+        break; // Connection closed cleanly by peer.
+      else if (error)
+        throw boost::system::system_error(error); // Some other error.
+
+      std::cout.write(buf.data(), len);
+    }
+  }
+}
+
+private:
+  tcp_query(std::string ip = "127.0.0.1"){ip_addr_ = ip;}  /* Constructor */
+  ~tcp_query(); /* Destructor */
+  
+  std::string ip_addr_;
 };

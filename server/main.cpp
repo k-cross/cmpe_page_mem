@@ -7,26 +7,32 @@
 #include <iostream>
 #include <string>
 #include <boost/asio.hpp>
-#include "tcp_boostsv.cpp"
+#include "tcp_sv.cpp"
 using boost::asio::ip::tcp;
 
 int main(int argc, char* argv[]){
-  try{
-    /* Uncomment the lines below after client completion */
+    std::string tcp_port = "6666";
+    std::string more = "n";
+    int tcpp = 6666;
 
-    /*if (argc != 2){
-      std::cerr << "Usage: client <host>" << std::endl;
-      return 1;
-    }*/
+    for(;;){
+        try{
+            std::cout << argv[0] << " listen on port " << tcp_port << std::endl;
+            async_tcp_server *recv_file_tcp_server = new async_tcp_server(tcpp);
+            delete recv_file_tcp_server;
+        }
 
-    boost::asio::io_service io_service;
-    tcp_server server(io_service);
-    io_service.run();
-  }
+        catch (std::exception& e){
+            std::cerr << e.what() << std::endl;
+        }
 
-  catch (std::exception& e){
-    std::cerr << e.what() << std::endl;
-  }
+        std::cout << "Map more memory? 'y' or 'n': ";
+        std::cin >> more;
 
-  return 0;
+        if(more == "n"){
+            break;
+        }
+    }
+
+    return 0;
 }

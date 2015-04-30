@@ -1,53 +1,47 @@
 /*
  * <Author> Kenneth Cross
  * <Date> 04/27/2015
- * <Matter> Main memory server connected through tcp
+ * <Matter> Main memory client connected through tcp
  */
 
 #include <iostream>
 #include <string>
-#include <boost/bind.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/enable_shared_from_this.hpp>
 #include <boost/asio.hpp>
-#include "tcp_boostcl.cpp"
+#include "tcp_cl.cpp"
 
 using boost::asio::ip::tcp;
 
 int main(int argc, char* argv[]){
-  try{
-    if (argc != 2){
-      std::cerr << "Usage: client <host>" << std::endl;
-      return 1;
+    if (argc < 2){
+        std::cerr << "Usage: " << argv[0] 
+            << " <server-address> and/or <file path>" << std::endl;
+        return __LINE__;
     }
 
-    boost::asio::io_service io_service;
+    std::string server_ip = argv[1];
+    std::string path = argv[2]; // Probably don't care about this
+    std::string more = "n"; // string to break loop
 
-    tcp::resolver resolver(io_service);
-    tcp::resolver::query query(argv[1], "6666"); /* Port Number or Service Name */
-    tcp::resolver::iterator endpoint_iterator = resolver.resolve(query);
+    for(;;){
+        try{
+            boost::asio::io_service io_service;
+            async_tcp_client client(io_service, argv[1], argv[2]);
+            io_service.run();
 
-    tcp::socket socket(io_service);
-    boost::asio::connect(socket, endpoint_iterator);
+            std::cout << "send file " << argv[2] << " completed successfully.\n";
+        }
 
-    for (;;){
-      boost::array<char, 128> buf;
-      boost::system::error_code error;
+        catch (std::exception& e){
+            std::cerr << e.what() << std::endl;
+        }
 
-      size_t len = socket.read_some(boost::asio::buffer(buf), error);
+        std::cout << "Map more memory? 'y' or 'n': ";
+        std::cin >> more;
 
-      if (error == boost::asio::error::eof)
-        break; // Connection closed cleanly by peer.
-      else if (error)
-        throw boost::system::system_error(error); // Some other error.
-
-      std::cout.write(buf.data(), len);
+        if(more == "n"){
+            break;
+        }
     }
-  }
 
-  catch (std::exception& e){
-    std::cerr << e.what() << std::endl;
-  }
-
-  return 0;
+    return 0;
 }
