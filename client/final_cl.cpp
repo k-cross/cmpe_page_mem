@@ -20,10 +20,16 @@
 using namespace std;
 using boost::asio::ip::tcp;
 
+/* Global Vars */
 void* r_addr = (int*)0xaaaa;
 int r_len = 0x4000;
 char value[25];
-
+std::string server;
+std::string path; 
+std::string cs_msg = "message"; 
+std::string more = "n";
+int tcpp = 6666;
+    
 void* __attribute__((weak)) mmap(void *addrs, 
     size_t lengths, int prots, int flag, int fds)
 {
@@ -47,16 +53,13 @@ size_t getFilesize(const char* filename) {
 }
 
 void r_mapHandler(int signum){
-    std::string more = "n";
+    more = "n";
 
-	cout << "Sending Value: " << value << " to be mapped into Remote Memory" << endl;
+	cout << "Sending Value: " << value << " to be mapped into Remote Memory\n";
 
 	// ********************VALUE SENT TO SERVER*******************
     for(;;){
-        std::string server = "";
-        std::string path = "";
 	    cout << "\n**SHOULD NOW SEND TO SERVER (DEBUG)**\n";
-        cout << "Server IP: "; cin >> server;
         cout << "Path: "; cin >> path;
         try{
             boost::asio::io_service io_service;
@@ -69,7 +72,7 @@ void r_mapHandler(int signum){
             std::cerr << e.what() << std::endl;
         }
 
-        std::cout << "more? ";
+        std::cout << "Send more values ('y' or 'n')? ";
         std::cin >> more;
 
         if(more == "n")
@@ -78,9 +81,8 @@ void r_mapHandler(int signum){
 }
 
 int main(int argc, char** argv) {
-    std::string server = argv[1];
-    std::string path = argv[2];
-    std::string more = "n";
+    server = argv[1];
+    path = argv[2];
 
     if (argc < 2){
         std::cerr << "Usage: " << argv[0] 
@@ -155,7 +157,7 @@ int main(int argc, char** argv) {
 
             try{
                 boost::asio::io_service io_service;
-                async_tcp_client client(io_service, server, path);
+                async_tcp_client client(io_service, server, cs_msg);
                 io_service.run();
 
                 std::cout << "send file " << path << " completed successfully.\n";
@@ -165,10 +167,7 @@ int main(int argc, char** argv) {
             }
 
             std::remove("message");
-
-            std::string tcp_port = "6666";
-            std::string more = "n";
-            int tcpp = 6666;
+            more = "n";
 
             for(;;){
                 try{
@@ -188,7 +187,6 @@ int main(int argc, char** argv) {
                     break;
                 }
             }
-
 
 			//wait
 			cout << " \n**VALUES AND ADDRESSES FROM SERVER SHOULD BE HERE! (DEBUG)**\n\n"; 

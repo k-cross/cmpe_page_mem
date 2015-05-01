@@ -18,6 +18,10 @@
 using namespace std;
 using boost::asio::ip::tcp;
 
+std::string client_ip;
+std::string more = "n";
+int tcpp = 6666;
+
 bool fexists(const char *filename)
 {
       ifstream ifile(filename);
@@ -34,10 +38,7 @@ size_t getFilesize(const char* filename) {
 
 int main(int argc, char** argv) {
     // TCP Vars
-    std::string tcp_port = "6666";
-    std::string client_ip = argv[1];
-    std::string more = "n";
-    int tcpp = 6666;
+    client_ip = argv[1];
 
     //Memory Server Vars
 	char value[25];
@@ -153,7 +154,7 @@ int main(int argc, char** argv) {
     		for(unsigned int i=0; i<pgs.size(); i++){
     			cout << "Syncing page " << i << " Located at: " << pgs[i] << endl;
 
-    			//TODO Send all the Mother flipping pages to Client (just Addresses and Values)
+    			//TODO Send all the pages to Client (just Addresses and Values)
 
                 for(;;){
                     std::string path = "./tmp";
