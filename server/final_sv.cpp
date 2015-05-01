@@ -149,6 +149,11 @@ int main(int argc, char** argv) {
     		for(unsigned int i=0; i<pgs.size(); i++){
     			cout << "Syncing page " << i << " Located at: " << pgs[i] << endl;
 
+                ofstream out;
+                out.open("unsync");
+                out << pgs[i];
+                out.close();
+
     			//TODO Send all the pages to Client (just Addresses and Values)
 
                 for(;;){
@@ -171,6 +176,8 @@ int main(int argc, char** argv) {
                     if(more == "n")
                         break;
                 }
+
+                std::remove("unsync");
 
     		    // Unmap pages after send (rest in pepperonis)
     		    rip = munmap(map, filesize);
