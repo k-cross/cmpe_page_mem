@@ -29,6 +29,8 @@ std::string path;
 std::string cs_msg = "message"; 
 std::string more = "n";
 int tcpp = 6666;
+
+void r_mapHandler(int signum);
     
 void* __attribute__((weak)) mmap(void *addrs, 
     size_t lengths, int prots, int flag, int fds)
@@ -37,7 +39,7 @@ void* __attribute__((weak)) mmap(void *addrs,
 	if(addrs == r_addr){
 		cout << "Potential Page or Segmentation Fault detected!\n";
 		cout << "Redirecting to Server Remote Memory...\n\n";
-		raise(SIGINT);
+        r_mapHandler(1);
 	}
 	else{
 		cout << "Non conflicting memory detected, check mprotect()\n";
