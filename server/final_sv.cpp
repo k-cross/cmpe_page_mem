@@ -34,8 +34,6 @@ size_t getFilesize(const char* filename) {
     return st.st_size;
 }
 
-/* The fun starts here */
-
 int main(int argc, char** argv) {
     // TCP Vars
     client_ip = argv[1];
@@ -68,7 +66,6 @@ int main(int argc, char** argv) {
 
 // **************Place cases here******************
         if(fexists("message")){  // File exists
-            //do x
             ifile.open("message");
             ifile >> value;
             if(value == "map")
@@ -86,9 +83,7 @@ int main(int argc, char** argv) {
     		cout << "Remote Page In of Value:" << value << " requested.\n";
     		cout << "Mapping page into memory...\n";
 
-    // TODO: Get Value from Client and put it in value
-    // NOTE to Kenny, you may have to change opt and create
-    // a loop here to start case 1 and case 2 based off of messages from Client
+// TODO: Get Value from Client and put it in value
 
             /* Passing messages through a file named message */
             //***********************************************
@@ -176,7 +171,6 @@ int main(int argc, char** argv) {
                     if(more == "n")
                         break;
                 }
-
 
     		    // Unmap pages after send (rest in pepperonis)
     		    rip = munmap(map, filesize);

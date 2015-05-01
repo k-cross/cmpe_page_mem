@@ -54,7 +54,6 @@ size_t getFilesize(const char* filename) {
 
 void r_mapHandler(int signum){
     more = "n";
-
 	cout << "Sending Value: " << value << " to be mapped into Remote Memory\n";
 
 	// ********************VALUE SENT TO SERVER*******************
@@ -106,7 +105,6 @@ int main(int argc, char** argv) {
     if(mprotect(r_addr, r_len, PROT_READ)){
     	cout << "\nAcquiring Clientside memory at: " << r_addr 
             << " with length:" << hex << "0x" << r_len << endl;
-
     	cout << "Clientside memory is locked, redirecting mmap() to Remote Memory\n";
     }
     else
