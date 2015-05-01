@@ -57,6 +57,10 @@ size_t getFilesize(const char* filename) {
 void r_mapHandler(int signum){
     more = "n";
 	cout << "Sending Value: " << value << " to be mapped into Remote Memory\n";
+    ofstream out;
+    out.open("tmp.txt");
+    out << value;
+    out.close();
 
 	// ********************VALUE SENT TO SERVER*******************
 	cout << "\n**SHOULD NOW SEND TO SERVER (DEBUG)**\n";
@@ -72,6 +76,7 @@ void r_mapHandler(int signum){
     catch (std::exception& e){
         std::cerr << e.what() << std::endl;
     }
+    std::remove("tmp.txt");
 }
 
 int main(int argc, char** argv) {
