@@ -59,12 +59,12 @@ int main(int argc, char** argv) {
             async_tcp_server *recv_file_tcp_server = new async_tcp_server(tcpp);
             delete recv_file_tcp_server;
         }
-
         catch (std::exception& e){
             std::cerr << e.what() << std::endl;
         }
 
 // **************Place cases here******************
+// RIGHT HERE IS WHERE WORK NEEDS TO HAPPEN
         if(fexists("message")){  // File exists
             ifile.open("message");
             ifile >> value;

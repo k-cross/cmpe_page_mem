@@ -57,25 +57,18 @@ void r_mapHandler(int signum){
 	cout << "Sending Value: " << value << " to be mapped into Remote Memory\n";
 
 	// ********************VALUE SENT TO SERVER*******************
-    for(;;){
-	    cout << "\n**SHOULD NOW SEND TO SERVER (DEBUG)**\n";
-        cout << "Path: "; cin >> path;
-        try{
-            boost::asio::io_service io_service;
-            async_tcp_client client(io_service, server, path);
-            io_service.run();
+	cout << "\n**SHOULD NOW SEND TO SERVER (DEBUG)**\n";
+    path = "./tmp.txt";
 
-            std::cout << "send file " << path << " completed successfully.\n";
-        }
-        catch (std::exception& e){
-            std::cerr << e.what() << std::endl;
-        }
+    try{
+        boost::asio::io_service io_service;
+        async_tcp_client client(io_service, server, path);
+        io_service.run();
 
-        std::cout << "Send more values ('y' or 'n')? ";
-        std::cin >> more;
-
-        if(more == "n")
-            break;
+        std::cout << "send file " << path << " completed successfully.\n";
+    }
+    catch (std::exception& e){
+        std::cerr << e.what() << std::endl;
     }
 }
 
@@ -141,10 +134,9 @@ int main(int argc, char** argv) {
     			cout << "mmap function failed, Please Restart!\n"; 
 
     		close(fd);
-
 		}
 		// Sync Time! ************************HERE*******************
-		if(opt == 2){
+        else if(opt == 2){
 			cout << "Sync Request Sent to server..." << endl;
 			// **********TODO Send Sync request to Server*********************
             // **********WORKING*********************
@@ -185,7 +177,6 @@ int main(int argc, char** argv) {
                     break;
                 }
             }
-
 			//wait
 			cout << " \n**VALUES AND ADDRESSES FROM SERVER SHOULD BE HERE! (DEBUG)**\n\n"; 
 		}
