@@ -1,2 +1,2 @@
 all:
-	g++ -g final_sv.cpp -lpthread -lboost_system -o server
+	g++ -g main.cpp -lpthread -lboost_system -o tcp_fserver

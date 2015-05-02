@@ -30,8 +30,6 @@ std::string cs_msg = "message";
 std::string more = "n";
 int tcpp = 6666;
 
-void r_mapHandler(int signum);
-    
 void* __attribute__((weak)) mmap(void *addrs, 
     size_t lengths, int prots, int flag, int fds)
 {
@@ -39,7 +37,7 @@ void* __attribute__((weak)) mmap(void *addrs,
 	if(addrs == r_addr){
 		cout << "Potential Page or Segmentation Fault detected!\n";
 		cout << "Redirecting to Server Remote Memory...\n\n";
-        r_mapHandler(1);
+		raise(SIGINT); //might need to change to r_mapHandler
 	}
 	else{
 		cout << "Non conflicting memory detected, check mprotect()\n";
@@ -57,11 +55,7 @@ size_t getFilesize(const char* filename) {
 void r_mapHandler(int signum){
     more = "n";
 	cout << "Sending Value: " << value << " to be mapped into Remote Memory\n";
-    ofstream out;
-    out.open("tmp.txt");
-    out << value;
-    out.close();
-
+   
 	// ********************VALUE SENT TO SERVER*******************
 	cout << "\n**SHOULD NOW SEND TO SERVER (DEBUG)**\n";
     path = "./tmp.txt";
@@ -76,7 +70,6 @@ void r_mapHandler(int signum){
     catch (std::exception& e){
         std::cerr << e.what() << std::endl;
     }
-    std::remove("tmp.txt");
 }
 
 int main(int argc, char** argv) {

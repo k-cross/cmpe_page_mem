@@ -16,7 +16,6 @@ void* r_addr = (int*)0xaaaa;
 int r_len = 0x4000;
 char value[25];
 
-
 void* __attribute__((weak)) mmap(void *addrs, 
     size_t lengths, int prots, int flag, int fds, void* r_addr)
 {
@@ -40,7 +39,7 @@ size_t getFilesize(const char* filename) {
     return st.st_size;
 }
 
-void r_mapHandler(int signum, char value[25]){
+void r_mapHandler(int signum){
 
 	cout << "Sending Value: " << value << " to be mapped into Remote Memory" << endl;
 

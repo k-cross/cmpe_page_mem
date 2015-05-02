@@ -14,7 +14,6 @@
 #include <boost/enable_shared_from_this.hpp>
 
 /* Global Vars */
-std::string tcp_port = "6666";
 
 class async_tcp_connection: public boost::enable_shared_from_this<async_tcp_connection>{
 public:

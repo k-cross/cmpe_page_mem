@@ -9,6 +9,7 @@
 #include <boost/bind.hpp>
 #include <fstream>
 #include <sstream>
+#include <string>
 using boost::asio::ip::tcp;
 
 class async_tcp_client{
@@ -18,13 +19,9 @@ public:
         : resolver_(io_service),
         socket_(io_service)
     {
-        size_t pos = server.find(':');
-        if (pos==std::string::npos){
-            return;
-        }
-
-        std::string port_string = server.substr(pos+1);
-        std::string server_ip_or_host = server.substr(0, pos);
+        //Modified here so that the port is just hardcoded
+        std::string port_number = "4444";
+        std::string server_ip_or_host = server;
 
         source_file.open(path.c_str(), std::ios_base::binary | std::ios_base::ate);
         if (!source_file){
@@ -38,7 +35,7 @@ public:
         request_stream << path << "\n"
             << file_size << "\n\n";
         std::cout << "request size:"<<request_.size()<<std::endl;
-        tcp::resolver::query query(server_ip_or_host, port_string);
+        tcp::resolver::query query(server_ip_or_host, port_number);
         resolver_.async_resolve(query,
             boost::bind(&async_tcp_client::handle_resolve, this,
             boost::asio::placeholders::error,
