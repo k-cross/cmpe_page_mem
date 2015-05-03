@@ -6,8 +6,6 @@
  * <How-To Use> All functions listen on port 4444
  * File Send: Include reciever's IP as a string
  * File Recieve: Listens until connection is made
- * String Send: Include reciever's IP as a string
- * String Recieve: Listens until connection is made
  * 
  */
 
