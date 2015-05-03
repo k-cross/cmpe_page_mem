@@ -1,2 +1,2 @@
 all:
-	g++ -g sv.cpp -lpthread -lboost_system -o sv
+	g++ -g kern_tests.cpp -o kern_module_test
