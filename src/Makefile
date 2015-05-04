@@ -1,2 +1,5 @@
+obj-m +=kern_tests.o
 all:
-	g++ -g kern_tests.cpp -o kern_module_test
+	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) modules
+clean:
+	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) clean
