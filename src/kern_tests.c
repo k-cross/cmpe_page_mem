@@ -12,16 +12,16 @@ MODULE_LICENSE("GPL"); /* Just include this, different licenses restrict usage *
 MODULE_AUTHOR("CMPE142");
 MODULE_DESCRIPTION("Test Code");
 
-static int __init module_init(void){
+static int __init kern_tests_init(void){
     printk(KERN_INFO "Hello world 1.\n");
 
     return 0;
 }
 
-static void __exit module(void)
+static void __exit kern_tests(void)
 {
         printk(KERN_INFO "Goodbye world 1.\n");
 }
 
-module_init(module_init); /* Maybe just used to redefine names */
-module_exit(module); 
+module_init(kern_tests_init); /* Maybe just used to redefine names */
+module_exit(kern_tests); 
