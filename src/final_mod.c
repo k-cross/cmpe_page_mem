@@ -17,8 +17,6 @@
 #include <asm/unistd.h>
 #include <asm/page.h>
 #include <net/sock.h>
-#include <stdlib.h>
-#include <stdio.h>
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("CMPE142 Group");
@@ -100,7 +98,6 @@ asmlinkage long custom_mmap (unsigned long addr, size_t len,
     printk("Redirecting to RM_server through Client...");
 
 		// TODO: Write back the Value to client app
-    *msg = "sent";
 
 		return 0;
 	}
@@ -154,6 +151,7 @@ static int our_ioctl(struct file *file, unsigned int cmd,
 
 	r_addr = start_a;
 	r_addr_end = end_a;
+  msg = r_addr; //added
 
 	//Implementation of iocrl - To patch __NR_mmap (sys_mmap) in the sys_call_table
 	switch(cmd)
