@@ -17,6 +17,8 @@
 #include <asm/unistd.h>
 #include <asm/page.h>
 #include <net/sock.h>
+#include <stdlib.h>
+#include <stdio.h>
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("CMPE142 Group");
@@ -98,7 +100,9 @@ asmlinkage long custom_mmap (unsigned long addr, size_t len,
     printk("Redirecting to RM_server through Client...");
 
 		// TODO: Write back the Value to client app
-    *msg = (char)addr;
+    char changes[25];
+    itoa (i,changes,16);
+    *msg = changes;
 
 		return 0;
 	}
