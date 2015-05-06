@@ -26,21 +26,21 @@ MODULE_DESCRIPTION("Remote Memory module for the CMPE 142 Project");
 
 #define NETLINK_USER 31
 
-struct sock *nl_sk = NULL; /* WTF do these values mean, these names suck! */
+struct sock *nl_sk = NULL; /* Null Socket */
 
 static void hello_nl_recv_msg(struct sk_buff *skb) {
-  struct nlmsghdr *nlh;
+  struct nlmsghdr *nlh; /* Null Message Header */
   int pid;
-  struct sk_buff *skb_out;
+  struct sk_buff *skb_out; /* I think this means socket buffer */
   int msg_size;
-  char *msg="Hello from kernel";
+  char *msg = "Hello from kernel";
   int res;
   
   printk(KERN_INFO "Entering: %s\n", __FUNCTION__);
   
   msg_size=strlen(msg);
   
-  nlh=(struct nlmsghdr*)skb->data;
+  nlh = (struct nlmsghdr*)skb->data;
   printk(KERN_INFO "Netlink received msg payload:%s\n",
           (char*)nlmsg_data(nlh));
   pid = nlh->nlmsg_pid; //pid of sending process 
@@ -57,8 +57,8 @@ static void hello_nl_recv_msg(struct sk_buff *skb) {
   strncpy(nlmsg_data(nlh),msg,msg_size);
   res = nlmsg_unicast(nl_sk,skb_out,pid);
 
-  if(res<hello_nl_recv_msg)
-      printk(KERN_INFO "Error while sending bak to user\n");
+  if(res < hello_nl_recv_msg)
+      printk(KERN_INFO "Error while sending back to user\n");
 }
 
 /* Memory Defined Things */
@@ -198,9 +198,7 @@ static int __init init_mod(void){
   /* Netlink's main functions */
   printk("Entering: %s\n",__FUNCTION__);
   
-  struct netlink_kernel_cfg cfg = {
-      .input = hello_nl_recv_msg,
-  };
+  struct netlink_kernel_cfg cfg = { .input = hello_nl_recv_msg, };
 
   nl_sk = netlink_kernel_create(&init_net, NETLINK_USER, &cfg);
   

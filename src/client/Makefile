@@ -11,8 +11,8 @@ test: all
 	sudo rmmod hello
 	dmesg | tail
 
-kenny: final_cl.cpp
-	g++ -g final_cl.cpp -lpthread -lboost_system -o client
+kenny: 
+	g++ -g testc.cpp -lpthread -lboost_system -o testc
 
 ziyi_mod:
 	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) modules

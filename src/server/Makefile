@@ -1,2 +1,3 @@
-all:
-	g++ -g final_sv.cpp -lpthread -lboost_system -o server
+all: tests
+tests:
+	g++ -g tests.cpp -lpthread -lboost_system -o tests
