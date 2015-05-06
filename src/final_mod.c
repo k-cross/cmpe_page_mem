@@ -22,6 +22,8 @@ MODULE_LICENSE("GPL");
 MODULE_AUTHOR("CMPE142 Group");
 MODULE_DESCRIPTION("Remote Memory module for the CMPE 142 Project");
 
+char *msg = "Hello from kernel";
+
 /* Netlink Defined Things */
 
 #define NETLINK_USER 31
@@ -33,7 +35,7 @@ static void hello_nl_recv_msg(struct sk_buff *skb) {
   int pid;
   struct sk_buff *skb_out; /* I think this means socket buffer */
   int msg_size;
-  char *msg = "Hello from kernel";
+  /*char *msg = "Hello from kernel";*/
   int res;
   
   printk(KERN_INFO "Entering: %s\n", __FUNCTION__);
