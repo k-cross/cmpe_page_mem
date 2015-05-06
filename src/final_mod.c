@@ -155,8 +155,8 @@ static int our_ioctl(struct file *file, unsigned int cmd,
   {
 	case IOCTL_PATCH_TABLE:
 		make_rw((unsigned long)sys_call_table); // make table writeable
-		real_mmap = (void*)*(sys_call_table + __NR_mmap); // store the table's  sys_mmap pointer
-		*(sys_call_table + __NR_mmap) = (unsigned long)custom_mmap; // write custom_mmap pointer
+		real_mmap = (void*)*(sys_call_table + __NR_mmap); // store the table's  sys_mmap ptr
+		*(sys_call_table + __NR_mmap) = (unsigned long)custom_mmap; // write custom_mmap ptr
 		make_ro((unsigned long)sys_call_table); // make table protected
 		is_set=1; // custom function written!
 		break;
@@ -193,7 +193,8 @@ static int __init init_mod(void){
 	int retval = misc_register(&our_device); // Register device with system
 
 	printk(KERN_INFO "Remote memory Module Successfully Initialized!\n");
-	return retval; // Note: Non-zero return means module couldn't be loaded.
+  if(retval < 0)
+	    return retval; /* Note: Non-zero return means module couldn't be loaded. MOD */
 
   /* Netlink's main functions */
   printk("Entering: %s\n",__FUNCTION__);
@@ -207,12 +208,11 @@ static int __init init_mod(void){
       return -10;
   }
   
-  return 0;
+  return retval; /* Modifying to return retval to help Mason's function */
 }
 
-static void __exit cleanup_mod(void)
-{
-	misc_deregister(&our_device); //Unregister this device with the system
+static void __exit cleanup_mod(void){
+	misc_deregister(&our_device); /* Unregister device NO REAL CHANGE HERE */
 
 	if(is_set){
 		make_rw((unsigned long)sys_call_table);
@@ -223,8 +223,8 @@ static void __exit cleanup_mod(void)
 	printk(KERN_INFO "Remote Memory Module Is cleaning up and Exiting...\n");
 
   /* Netlink Cleanup */
-  printk(KERN_INFO "exiting hello module\n");
   netlink_kernel_release(nl_sk);
+  printk(KERN_INFO "Exiting Netlink Module\n");
 }
 
 module_init(init_mod);

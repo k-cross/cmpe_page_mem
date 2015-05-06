@@ -1,3 +1,10 @@
+/* 
+ * <AUTHOR> Ziyi Feng
+ * <DATE>   05/06/2015
+ * <MATTER> Modified to send and recieve messages from user and get a response
+ * from the kernel
+ */
+
 #include <sys/socket.h>
 #include <linux/netlink.h>
 #include <unistd.h>
@@ -13,6 +20,10 @@ struct nlmsghdr *nlh = NULL;
 struct iovec iov;
 int sock_fd;
 struct msghdr msg;
+
+/* This should be relatively easy to make its own function
+ * where the only issue is figuring out how to implement
+ * it with the rest of our code. */
 
 int main(){
   sock_fd = socket(PF_NETLINK, SOCK_RAW, NETLINK_USER);
@@ -37,7 +48,7 @@ int main(){
   nlh->nlmsg_pid = getpid();
   nlh->nlmsg_flags = 0;
   
-  strcpy(NLMSG_DATA(nlh), "Hello");
+  strcpy(NLMSG_DATA(nlh), "Hello"); /* Sends this string to kernel module */
   
   iov.iov_base = (void *)nlh;
   iov.iov_len = nlh->nlmsg_len;
