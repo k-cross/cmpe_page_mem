@@ -100,9 +100,7 @@ asmlinkage long custom_mmap (unsigned long addr, size_t len,
     printk("Redirecting to RM_server through Client...");
 
 		// TODO: Write back the Value to client app
-    char changes[25];
-    itoa (i,changes,16);
-    *msg = changes;
+    *msg = "sent";
 
 		return 0;
 	}
