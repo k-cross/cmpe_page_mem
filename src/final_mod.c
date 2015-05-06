@@ -95,9 +95,10 @@ asmlinkage long custom_mmap (unsigned long addr, size_t len,
 	printk("interceptor: open(%zx, %zx, %lu)\n", addr, len, prot);
 	if((void*)addr == r_addr){
     printk("Intercepted Page Fault from RM_client at: 0x%zx of length: %zx\n", addr, len);
-    printk("Redirecting to RM_server...");
+    printk("Redirecting to RM_server through Client...");
 
 		// TODO: Write back the Value to client app
+    *msg = (char*)addr;
 
 		return 0;
 	}

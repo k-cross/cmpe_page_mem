@@ -105,6 +105,20 @@ int main(int argc, char** argv) {
 
 			// Sleep for a bit then revert the table
 			sleep(5);
+
+            std::string arguments = "FROM_USER";
+            std::string base_command = "./net_api ";
+            std::string full_command = base_command + arguments;
+
+            FILE* file = popen(full_command.c_str(), "r");
+            char buffer[100];
+            fscanf(file, "%100s", buffer);
+            pclose(file);
+
+            std::string from_buffer = buffer; //c++ string easier to work with
+
+            std::cout << "\n Received Value: " << value << " from " 
+                << from_buffer << std::endl;
 			ioctl(device, IOCTL_FIX_TABLE); // tell the cDriver (kMod) to remove sys_call_table patch
 			close(device);
 
