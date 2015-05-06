@@ -1,3 +1,4 @@
+#include <linux/kernel.h>
 #include <linux/module.h>
 #include <net/sock.h>
 #include <linux/netlink.h>
@@ -11,11 +12,11 @@ struct sock *nl_sk = NULL;
 
 static void hello_nl_recv_msg(struct sk_buff *skb) {
   struct nlmsghdr *nlh;
-  int pid;
   struct sk_buff *skb_out;
   int msg_size;
-  char *msg="Hello from kernel";
+  int pid;
   int res;
+  char *msg="Hello from kernel";
   
   printk(KERN_INFO "Entering: %s\n", __FUNCTION__);
   
@@ -35,19 +36,14 @@ static void hello_nl_recv_msg(struct sk_buff *skb) {
   nlh=nlmsg_put(skb_out,0,0,NLMSG_DONE,msg_size,0);  
   NETLINK_CB(skb_out).dst_group = 0; /* not in mcast group */
   strncpy(nlmsg_data(nlh),msg,msg_size);
-  res=nlmsg_unicast(nl_sk,skb_out,pid);
-
-  /*if(res<0hello_nl_recv_msg)
-      printk(KERN_INFO "Error while sending bak to user\n");*/
+  res = nlmsg_unicast(nl_sk,skb_out,pid);
 }
 
 static int __init hello_init(void) {
   printk("Entering: %s\n",__FUNCTION__);
   /* This is for 3.6 kernels and above. */
   
-  struct netlink_kernel_cfg cfg = {
-      .input = hello_nl_recv_msg,
-  };
+  struct netlink_kernel_cfg cfg = {.input = hello_nl_recv_msg,};
 
   nl_sk = netlink_kernel_create(&init_net, NETLINK_USER, &cfg);
   
