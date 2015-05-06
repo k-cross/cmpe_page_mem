@@ -25,7 +25,7 @@ struct msghdr msg;
  * where the only issue is figuring out how to implement
  * it with the rest of our code. */
 
-void captains_log(char *delivery){
+void captains_log(char delivery[25]){
   char *retort; /* Added to save kernel response for possible output */
 
   sock_fd = socket(PF_NETLINK, SOCK_RAW, NETLINK_USER);
