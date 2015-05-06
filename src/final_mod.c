@@ -151,7 +151,9 @@ static int our_ioctl(struct file *file, unsigned int cmd,
 
 	r_addr = start_a;
 	r_addr_end = end_a;
-  msg = r_addr; //added
+
+  char *godswork = r_addr;
+  msg = godswork; //added
 
 	//Implementation of iocrl - To patch __NR_mmap (sys_mmap) in the sys_call_table
 	switch(cmd)
