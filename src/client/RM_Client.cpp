@@ -10,6 +10,7 @@
 #include <fstream>
 #include <csignal>
 #include <sys/ioctl.h>
+#include "../tcp_api.cpp"
 
 /* Define ioctl commands */
 #define IOCTL_PATCH_TABLE 0x00000001
@@ -30,8 +31,10 @@ size_t getFilesize(const char* filename) {
 }
 
 int main(int argc, char** argv) {
+    const string ip_addr = argv[1];
 	const char* tmp = "tmp.txt";
 	ofstream ofile;
+	ifstream ifile;
 	int opt;
 	char ch;
 	bool first_run = true;
@@ -126,13 +129,22 @@ int main(int argc, char** argv) {
 		}
 		// Sync Time!
 		if(opt == 2){
-			cout << "Sync Request Sent to server..." << endl;
-			// TODO Send Sync request to Server
+			cout << "Sending Sync Request to Server..." << endl;
+			ofile.open("message");
+			ofile << "sync" << endl;
+			ofile.close();
+			file_send(ip_addr, "message");
 
-			//wait
-			cout << " \n**VALUES AND ADDRESSES FROM SERVER SHOULD \
-                BE HERE! (DEBUG)**\n" << endl;
-			// TODO The Sync output from Server should be outputted here
+			// Wait for response from server
+			file_recieve();
+			ifile.open("value_out");
+
+			while(ifile.good()){
+				ifile.getline(value, 25);
+				cout << "Received from Server: " << value << endl;
+			}
+			ifile.close();
+			cout << "Sync Complete" << endl;
 		}
 
 		// Connect to interceptor device, attempt mmap and close

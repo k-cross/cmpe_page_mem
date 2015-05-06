@@ -10,4 +10,4 @@ netlink_ext_test:
 	g++ -g external_progX.cpp -o netlink_test
 
 mem_client:
-	g++ -g RM_Client.cpp -o client
+	g++ -g RM_Client.cpp -lpthread -lboost_system -o client

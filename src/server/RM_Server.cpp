@@ -2,7 +2,7 @@
 // Name        : CMPE_142_RM_Server.cpp
 // Author      : Mason
 // Version     :
-// Copyright   : 
+// Copyright   :
 // Description :
 //============================================================================
 
@@ -16,111 +16,119 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <string>
+#include "../tcp_api.cpp"
 
 using namespace std;
 
 size_t getFilesize(const char* filename) {
-    struct stat st;
-    stat(filename, &st);
-    return st.st_size;
+	struct stat st;
+	stat(filename, &st);
+	return st.st_size;
 }
 
-int main(int argc, char** argv) {
+int main (void){
 
-	char value[25];
+	string temp_m, temp_v;
+	int i = 1;
+	ifstream message;
+	ifstream value;
+	ofstream value_out;
 	const char* tmp = "tmp.txt"; // temp file for FD
 	ofstream ofile;
-	int opt = 3;
+	size_t filesize;
+	int fd;
+	int rip;
+	int* map;
+	//void* range = (void*)0xaaaaa000;
+	vector<int*> pgs;
+	const string ip_addr = "10.0.0.2"; // Client's IP
 
-    size_t filesize;
-    int fd;
-    int rip;
-    int* map;
-    //void* range = (void*)0xaaaaa000;
+	//
+	// Master Server loop
+	// IFSTREAM message -> temp_m
+	// IFSTREAM value	-> temp_v
+	// IFSTREAM value_out
+	while (1 == 1){
 
-    vector<int*> pgs;
+		file_recieve();
+		message.open("message");
+		message >> temp_m;
+		message.close();
 
-    cout << "Server process Initialized!\n";
+		if (temp_m == "mem"){
 
-    while (opt!=0){
+			file_recieve();
+			value.open("value");
+			value >> temp_v;
+			value.close();
 
-        cout << "***SAMPLE DIALOG (Working ver will not have) 1 to map a page\n 2 to SYNC all pgs. 0 to exit" << endl;
-        cin >> opt;
+			//Start MMapping temp_v
+			ofile.open(tmp);
+			ofile << temp_v;
+			ofile.close();
 
-        // Case 1. Map a Page
-    	if (opt == 1){
-    		cout << "Remote Page In of Value:" << value << " requested.\n";
-    		cout << "Mapping page into memory...\n";
+			filesize = getFilesize(tmp);
 
-    		// TODO: Get Value from Client and put it in value
-    		// NOTE to Kenny, you may have to change opt and create
-    		// a loop here to start case 1 and case 2 based off of messages from Client
+			//Open file
+			fd = open(tmp, O_RDONLY, 0);
+			assert(fd != -1);
 
-    		cout << "***SAMPLE DIALOGEnter a value" << endl;
-    		cin >> value;
+			//cout << "Range is: " << range << endl;
+			//Execute mmap
+			map = (int*)mmap(NULL, filesize, PROT_READ, MAP_PRIVATE | MAP_POPULATE, fd, 0);
+			//range = (char*)range + filesize;
 
-    		ofile.open(tmp);
-    		ofile << value;
-    		ofile.close();
+			//Error Check mmap
+			if (map == MAP_FAILED) {
+				close(fd);
+				cout << "Error mmapping the file, please restart!\n";
+				return 0;
+			}
+			assert(map != NULL);
 
-    		filesize = getFilesize(tmp);
+			// Add to vector of Page addresses
+			pgs.push_back(map);
 
-    		//Open file
-    		fd = open(tmp, O_RDONLY, 0);
-    		assert(fd != -1);
+			//Write the mmapped data to stdout (= FD #1)
+			cout << "Page Successfully mapped to: " << map << " !\n" << endl;
+			cout << "Value in Remote memory: " << endl;
+			write(1, map, filesize);
+			cout << endl;
 
-
-    		//cout << "Range is: " << range << endl;
-    		//Execute mmap
-    		map = (int*)mmap(NULL, filesize, PROT_READ, MAP_PRIVATE | MAP_POPULATE, fd, 0);
-    		//range = (char*)range + filesize;
-
-    		//Error Check mmap
-    		if (map == MAP_FAILED) {
-    			close(fd);
-    			cout << "Error mmapping the file, please restart!\n";
-    			return 0;
-    		}
-    		assert(map != NULL);
-
-    		// Add to vector of Page addresses
-    		pgs.push_back(map);
-
-    		//Write the mmapped data to stdout (= FD #1)
-    		cout << "Page Successfully mapped to: " << map << " !\n" << endl;
-    		cout << "Value in Remote memory: " << endl;
-    		write(1, map, filesize);
-    		cout << endl;
-
-    		close(fd);
-
-    	}
-
-    	// Case 2. Sync All pages
-    	if(opt==2){
-    		cout << "Starting Sync to Client..." << endl;
-
-    		for(unsigned int i=0; i<pgs.size(); i++){
-
-    			cout << "Syncing page " << i << " Located at: " << pgs[i] << endl;
-
-    			//TODO Send all the Mother flipping pages to Client (just Addresses and Values)
+			close(fd);
+			// End MMapping temp_v
 
 
-    		    // Unmap pages after send (rest in pepperonis)
-    		    rip = munmap(map, filesize);
-    		    if (rip != 0){
-    		    	cout << "page # " << i << " at " << pgs[i] << " Failed to UNMAP!";
-    		    }
+		}
+		else if (temp_m == "sync"){
 
-    		    assert(rip == 0);
-    		    close(fd);
-    		}
-    		cout << "\nSync Complete!" << endl;
-    	}
+			value_out.open("value_out");
+
+			cout << "Starting Sync to Client..." << endl;
+			for(unsigned int i=0; i<pgs.size(); i++){
+
+				cout << "Syncing page " << i << " Located at: " << pgs[i] << endl;
+				value_out << "Address: " << hex << pgs[i] << " Value: " << pgs[i] << endl;
+
+				// Unmap pages after send
+				rip = munmap(map, filesize);
+				if (rip != 0){
+					cout << "page # " << i << " at " << pgs[i] << " Failed to UNMAP!";
+				}
+				assert(rip == 0);
+				close(fd);
+			}
+			value_out.close();
+			//Send all the  pages to Client (just Addresses and Values)
+			file_send(ip_addr, "value_out");
+
+			cout << "\nSync Complete!" << endl;
+		}
+
 
 	}
-    cout << "Server process will now exit" << endl;
-    return 0;
-
+	// Main loop Exited
+	cout << "server will now exit..." << endl;
+	return 0;
 }

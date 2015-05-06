@@ -30,7 +30,6 @@ size_t getFilesize(const char* filename) {
 	return st.st_size;
 }
 
-
 int main(int argc, char* argv[]) {
     const string ip_addr = argv[1];
 	const char* tmp = "tmp.txt";
@@ -43,19 +42,7 @@ int main(int argc, char* argv[]) {
 	size_t filesize;
 	int fd;
 
-	/* Protect Client's memory NOT USED ANYMORE!
-    cout << "Client Initialized!\n";
-
-    if(mprotect(r_addr, r_len, PROT_READ)){
-    	cout << "\nAcquiring Clientside memory at: " << r_addr << " with length:" << hex << "0x" << r_len << endl;
-    	cout << "Clientside memory is locked, redirecting mmap() to Remote Memory" << endl;
-    }
-    else
-    	cout << "mprotect has failed, please restart!" << endl;
-	 */
-
 	do{
-
 		cout << "\n*************Please Make a Selection**************" << endl;
 		cout << "Enter 1 to map a value to remote memory\n";
 		cout << "Enter 2 to request a sync of remote memory\n";
