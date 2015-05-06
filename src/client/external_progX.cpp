@@ -13,6 +13,7 @@ int main(int argc, char* argv[]){
   pclose(file);
 
   std::string from_buffer = buffer; //c++ string easier to work with
+  cout << from_buffer << endl;
 
   return 0;
 }
