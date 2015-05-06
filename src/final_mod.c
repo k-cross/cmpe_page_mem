@@ -68,7 +68,7 @@ static void hello_nl_recv_msg(struct sk_buff *skb) {
 /* System Call Table address found with:
 grep "sys_call_table" /boot/System.map-3.13.0-51-generic */
 
-unsigned long *sys_call_table = (unsigned long*)0xffffffff81801400; //NOTE! THIS IS SYSTEM SPECIFIC
+unsigned long *sys_call_table = (unsigned long*)0xffffffff81601440; //NOTE! THIS IS SYSTEM SPECIFIC
 
 /* 0: real System call is in use
    1: custom system call is in use */
