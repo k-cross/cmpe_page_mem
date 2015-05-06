@@ -6,7 +6,7 @@
 #include <stdio.h>
 
 #define NETLINK_USER 31
-#define MAX_PAYLOAD 1024 /* maximum payload size*/
+#define MAX_PAYLOAD 1024
 
 struct sockaddr_nl src_addr, dest_addr;
 struct nlmsghdr *nlh = NULL;
@@ -15,8 +15,8 @@ int sock_fd;
 struct msghdr msg;
 
 int main(){
-  sock_fd=socket(PF_NETLINK, SOCK_RAW, NETLINK_USER);
-  if(sock_fd<0)
+  sock_fd = socket(PF_NETLINK, SOCK_RAW, NETLINK_USER);
+  if(sock_fd < 0)
     return -1;
   
   memset(&src_addr, 0, sizeof(src_addr));

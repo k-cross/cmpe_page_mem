@@ -28,7 +28,7 @@ size_t getFilesize(const char* filename) {
 int main(int argc, char** argv) {
 
 	char value[25];
-	const char* tmp = "tmp.txt";
+	const char* tmp = "tmp.txt"; // temp file for FD
 	ofstream ofile;
 	int opt = 3;
 
@@ -36,6 +36,7 @@ int main(int argc, char** argv) {
     int fd;
     int rip;
     int* map;
+    //void* range = (void*)0xaaaaa000;
 
     vector<int*> pgs;
 
@@ -51,10 +52,11 @@ int main(int argc, char** argv) {
     		cout << "Remote Page In of Value:" << value << " requested.\n";
     		cout << "Mapping page into memory...\n";
 
-    // TODO: Get Value from Client and put it in value
-    // NOTE to Kenny, you may have to change opt and create
-    // a loop here to start case 1 and case 2 based off of messages from Client
+    		// TODO: Get Value from Client and put it in value
+    		// NOTE to Kenny, you may have to change opt and create
+    		// a loop here to start case 1 and case 2 based off of messages from Client
 
+    		cout << "***SAMPLE DIALOGEnter a value" << endl;
     		cin >> value;
 
     		ofile.open(tmp);
@@ -67,8 +69,11 @@ int main(int argc, char** argv) {
     		fd = open(tmp, O_RDONLY, 0);
     		assert(fd != -1);
 
+
+    		//cout << "Range is: " << range << endl;
     		//Execute mmap
     		map = (int*)mmap(NULL, filesize, PROT_READ, MAP_PRIVATE | MAP_POPULATE, fd, 0);
+    		//range = (char*)range + filesize;
 
     		//Error Check mmap
     		if (map == MAP_FAILED) {

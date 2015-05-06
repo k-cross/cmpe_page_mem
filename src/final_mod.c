@@ -3,6 +3,8 @@
  * <DATE>   05/05/2015
  * <MATTER> Stiching Mason's and Ziyi's modules into one
  * coherent final module that does it all!!!
+ *
+ * Giving up on shitty fucking Ziyi's code. Document your fucking shit you cunt
  */
 
 #include <linux/module.h>
@@ -26,7 +28,7 @@ MODULE_DESCRIPTION("Remote Memory module for the CMPE 142 Project");
 
 #define NETLINK_USER 31
 
-struct sock *nl_sk = NULL;
+struct sock *nl_sk = NULL; /* WTF do these values mean, these names suck assholes! */
 
 static void hello_nl_recv_msg(struct sk_buff *skb) {
   struct nlmsghdr *nlh;
@@ -41,7 +43,8 @@ static void hello_nl_recv_msg(struct sk_buff *skb) {
   msg_size=strlen(msg);
   
   nlh=(struct nlmsghdr*)skb->data;
-  printk(KERN_INFO "Netlink received msg payload:%s\n",(char*)nlmsg_data(nlh));
+  printk(KERN_INFO "Netlink received msg payload:%s\n",
+          (char*)nlmsg_data(nlh));
   pid = nlh->nlmsg_pid; //pid of sending process 
   
   skb_out = nlmsg_new(msg_size,0);
@@ -51,10 +54,10 @@ static void hello_nl_recv_msg(struct sk_buff *skb) {
       return;
   } 
 
-  nlh=nlmsg_put(skb_out,0,0,NLMSG_DONE,msg_size,0);  
+  nlh = nlmsg_put(skb_out,0,0,NLMSG_DONE,msg_size,0);  
   NETLINK_CB(skb_out).dst_group = 0; //not in mcast group
   strncpy(nlmsg_data(nlh),msg,msg_size);
-  res=nlmsg_unicast(nl_sk,skb_out,pid);
+  res = nlmsg_unicast(nl_sk,skb_out,pid);
 
   if(res<hello_nl_recv_msg)
       printk(KERN_INFO "Error while sending bak to user\n");
@@ -174,26 +177,25 @@ static int our_ioctl(struct file *file, unsigned int cmd,
 }
 
 static const struct file_operations our_fops =\
-		{
-	.owner = THIS_MODULE,
-			.open = &our_open,
-			.release = &our_release,
-			.unlocked_ioctl = (void*)&our_ioctl,
-			.compat_ioctl = (void*)&our_ioctl
-		};
-static struct miscdevice our_device = \
-		{
-	MISC_DYNAMIC_MINOR,
-	"interceptor",
-	&our_fops
-		};
-
-static int __init init_mod(void)
 {
-	int retval = misc_register(&our_device); // Register this device with the system
+  .owner = THIS_MODULE,
+  .open = &our_open,
+  .release = &our_release,
+  .unlocked_ioctl = (void*)&our_ioctl,
+  .compat_ioctl = (void*)&our_ioctl
+};
+static struct miscdevice our_device = \
+{
+  MISC_DYNAMIC_MINOR,
+  "interceptor",
+  &our_fops
+};
+
+static int __init init_mod(void){
+	int retval = misc_register(&our_device); // Register device with system
 
 	printk(KERN_INFO "Remote memory Module Successfully Initialized!\n");
-	return retval;    // Note: Non-zero return means that the module couldn't be loaded.
+	return retval; // Note: Non-zero return means module couldn't be loaded.
 
   /* Netlink's main functions */
   printk("Entering: %s\n",__FUNCTION__);
