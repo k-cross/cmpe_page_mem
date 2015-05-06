@@ -30,7 +30,7 @@ size_t getFilesize(const char* filename) {
 	return st.st_size;
 }
 
-int main(int argc, char** argv) {
+int main(int argc, char* argv[]) {
     const string ip_addr = argv[1];
 	const char* tmp = "tmp.txt";
 	ofstream ofile;
@@ -55,8 +55,7 @@ int main(int argc, char** argv) {
 		// OPTION 1: Manually map memory
 		if(opt == 1){
 			if(first_run){
-				cout << "Would you like to specify a start \
-                    and end address for remote memory? (Y/n)\n";
+				cout << "Would you like to specify a start and end address for remote memory? (Y/n)" << endl;
 				cin >> ch;
 				if(ch == 'Y' || ch == 'y'){
 					cout << "\nPlease enter a start address (Omitting the '0x')" << endl;
@@ -65,12 +64,10 @@ int main(int argc, char** argv) {
 					cout << "\nPlease enter an end address (Omitting the '0x')" << endl;
 					cin >> r_addr_end;
 
-					cout << "\nOk! Using values: "<< hex << r_addr << " through " 
-                        << hex << r_addr_end << " for Remote Memory" << endl;
+					cout << "\nOk! Using values: "<< hex << r_addr << " through " << hex << r_addr_end << " for Remote Memory" << endl;
 				}
 				else
-					cout << "\nUsing default values: " << hex << "0x" << r_addr 
-                        << " - " << hex << "0x" << r_addr_end << endl;
+					cout << "\nUsing default values: " << hex << "0x" << r_addr << " - " << hex << "0x" << r_addr_end << endl;
 				first_run = false;
 			}
 			// Starting Manual memory mapping procedure
@@ -100,14 +97,21 @@ int main(int argc, char** argv) {
 			cout << "Calling mmap to page into Remote memory..." << endl;
 			map = (int*)mmap(r_addr, filesize, PROT_READ, MAP_PRIVATE | MAP_POPULATE, fd, 0);
 
-			if(map == 0) cout << "SUCCESS! : memory was mapped \
-                remotely (Special RM_kMod return code)" << endl;
-			else if(map > 0) cout << "ERROR: mmap Succeeded! MEMORY WAS \
-                WRITTEN LOCALLY" << endl;
+			if(map == 0) cout << "SUCCESS! : memory was mapped remotely (Special RM_kMod return code)" << endl;
+			//else if (map == MAP_FAILED)cout << "ERROR: map Failed" << endl;
+			else if(map > 0) cout << "ERROR: mmap Succeeded! MEMORY WAS WRITTEN LOCALLY" << endl;
 			close(fd);
 
 			// Sleep for a bit then revert the table
-			sleep(5);
+			sleep(2);
+
+			// Send Value to Server (message first then value)! OFSREAM ofile --> value
+			ofile.open("message");
+			ofile << "mem" << endl;
+			ofile.close();
+
+			file_send(ip_addr, "message");
+			sleep(2);
 
             std::string arguments = "FROM_USER";
             std::string base_command = "./net_api ";
@@ -122,9 +126,15 @@ int main(int argc, char** argv) {
 
             std::cout << "\n Received Value: " << value << " from " 
                 << from_buffer << std::endl;
+	
+			// Send value
+			ofile.open("value");
+			ofile << value << endl;
+			file_send(ip_addr, "value");
+
+
 			ioctl(device, IOCTL_FIX_TABLE); // tell the cDriver (kMod) to remove sys_call_table patch
 			close(device);
-
 
 		}
 		// Sync Time!
@@ -150,9 +160,9 @@ int main(int argc, char** argv) {
 		// Connect to interceptor device, attempt mmap and close
 		if(opt == 3){
 
-		}
 
-	}while(opt >= 1 && opt <= 2);
+		}
+	}while(opt != 0 && opt >= 1 && opt <= 2);
 
 	cout << "RM_Client will now exit..." << endl;
 	return 0;
