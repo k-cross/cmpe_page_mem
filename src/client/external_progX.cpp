@@ -1,10 +1,10 @@
 #include <iostream>
+#include <fstream>
 #include <string>
-#include "../tcp_api.cpp"
 
 int main(int argc, char* argv[]){
   std::string arguments = argv[1];
-  std::string base_command = "./nettest ";
+  std::string base_command = "./net_api ";
   std::string full_command = base_command + arguments;
 
   FILE* file = popen(full_command.c_str(), "r");
