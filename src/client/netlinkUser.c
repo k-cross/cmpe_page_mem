@@ -60,14 +60,15 @@ void captains_log(char delivery[25]){
     msg.msg_iov = &iov;
     msg.msg_iovlen = 1;
     
-    printf("Sending message to kernel\n");
+    /* printf("Sending message to kernel\n"); // removal for buffer in external prog*/
     sendmsg(sock_fd,&msg,0);
-    printf("Waiting for message from kernel\n");
+    /*printf("Waiting for message from kernel\n"); // removal for buffer in external prog */
     
     /* Read message from kernel */
     recvmsg(sock_fd, &msg, 0);
     retort = (char *)NLMSG_DATA(nlh);
-    printf("Received message payload: %s\n", (char *)NLMSG_DATA(nlh));
+    /* printf("Received message payload: %s\n", (char *)NLMSG_DATA(nlh)); // Changed */
+    printf("%s\n", (char *)NLMSG_DATA(nlh));
     close(sock_fd);
   }
   else
