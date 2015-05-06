@@ -1,29 +1,79 @@
-#include <linux/module.h>    // included for all kernel modules
-#include <linux/kernel.h>    // included for KERN_INFO
-#include <linux/init.h>      // included for __init and __exit macros
-#include <linux/miscdevice.h> // Included for the character driver
+/* 
+ * <AUTHOR> Kennth Cross
+ * <DATE>   05/05/2015
+ * <MATTER> Stiching Mason's and Ziyi's modules into one
+ * coherent final module that does it all!!!
+ */
+
+#include <linux/module.h>
+#include <linux/kernel.h>
+#include <linux/init.h>
+#include <linux/miscdevice.h>
 #include <linux/fs.h>
 #include <linux/highmem.h>
+#include <linux/netlink.h>
+#include <linux/skbuff.h>
+#include <linux/mm.h>
 #include <asm/unistd.h>
 #include <asm/page.h>
-//#include <mm/memory.c>
-#include <linux/mm.h>
+#include <net/sock.h>
 
 MODULE_LICENSE("GPL");
-MODULE_AUTHOR("Mason Itkin");
+MODULE_AUTHOR("CMPE142 Group");
 MODULE_DESCRIPTION("Remote Memory module for the CMPE 142 Project");
+
+/* Netlink Defined Things */
+
+#define NETLINK_USER 31
+
+struct sock *nl_sk = NULL;
+
+static void hello_nl_recv_msg(struct sk_buff *skb) {
+  struct nlmsghdr *nlh;
+  int pid;
+  struct sk_buff *skb_out;
+  int msg_size;
+  char *msg="Hello from kernel";
+  int res;
+  
+  printk(KERN_INFO "Entering: %s\n", __FUNCTION__);
+  
+  msg_size=strlen(msg);
+  
+  nlh=(struct nlmsghdr*)skb->data;
+  printk(KERN_INFO "Netlink received msg payload:%s\n",(char*)nlmsg_data(nlh));
+  pid = nlh->nlmsg_pid; //pid of sending process 
+  
+  skb_out = nlmsg_new(msg_size,0);
+  
+  if(!skb_out){
+      printk(KERN_ERR "Failed to allocate new skb\n");
+      return;
+  } 
+
+  nlh=nlmsg_put(skb_out,0,0,NLMSG_DONE,msg_size,0);  
+  NETLINK_CB(skb_out).dst_group = 0; //not in mcast group
+  strncpy(nlmsg_data(nlh),msg,msg_size);
+  res=nlmsg_unicast(nl_sk,skb_out,pid);
+
+  if(res<hello_nl_recv_msg)
+      printk(KERN_INFO "Error while sending bak to user\n");
+}
+
+/* Memory Defined Things */
 
 /* System Call Table address found with:
 grep "sys_call_table" /boot/System.map-3.13.0-51-generic */
 
 unsigned long *sys_call_table = (unsigned long*)0xffffffff81801400; //NOTE! THIS IS SYSTEM SPECIFIC
 
-// 0: real System call is in use
-// 1: custom system call is in use
+/* 0: real System call is in use
+   1: custom system call is in use */
+
 int is_set=0;
 
 /* We will set this variable to 1 in our open handler and erset it
-back to zero in release handler*/
+back to zero in release handler */
 int in_use = 0;
 
 /* IOCTL commands -- we have defined these values only for us */
@@ -32,15 +82,17 @@ int in_use = 0;
 void *r_addr, *r_addr_end;
 
 // Pointer to original sys_mmap system function
-asmlinkage long (*real_mmap)(unsigned long, size_t, unsigned long, unsigned long, unsigned long, unsigned long);
+asmlinkage long (*real_mmap)(unsigned long, size_t, 
+        unsigned long, unsigned long, unsigned long, unsigned long);
 
 // Replacement sys_mmap
-asmlinkage long custom_mmap (unsigned long addr, size_t len, unsigned long prot, unsigned long flags, unsigned long fd, unsigned long offset){
-
+asmlinkage long custom_mmap (unsigned long addr, size_t len, 
+        unsigned long prot, unsigned long flags, unsigned long fd, unsigned long offset)
+{
 	printk("interceptor: open(%zx, %zx, %lu)\n", addr, len, prot);
 	if((void*)addr == r_addr){
-		printk("Intercepted Page Fault from RM_client at: 0x%zx of length: %zx\n", addr, len);
-		printk("Redirecting to RM_server...");
+    printk("Intercepted Page Fault from RM_client at: 0x%zx of length: %zx\n", addr, len);
+    printk("Redirecting to RM_server...");
 
 		// TODO: Write back the Value to client app
 
@@ -60,6 +112,7 @@ int make_rw(unsigned long address){
 		pte->pte |= _PAGE_RW;
 	return 0;
 }
+
 /* Make the page write protected */
 int make_ro(unsigned long address){
 	unsigned int level;
@@ -88,8 +141,9 @@ static int our_release(struct inode *inode, struct file *file){
 }
 
 /* This function will handle ioctl calls performed on our device */
-static int our_ioctl(struct file *file, unsigned int cmd, void* start_a, void* end_a, unsigned long arg){
-
+static int our_ioctl(struct file *file, unsigned int cmd, 
+        void* start_a, void* end_a, unsigned long arg)
+{
 	int retval = 0;
 
 	r_addr = start_a;
@@ -97,11 +151,11 @@ static int our_ioctl(struct file *file, unsigned int cmd, void* start_a, void* e
 
 	//Implementation of iocrl - To patch __NR_mmap (sys_mmap) in the sys_call_table
 	switch(cmd)
-	{
+  {
 	case IOCTL_PATCH_TABLE:
 		make_rw((unsigned long)sys_call_table); // make table writeable
 		real_mmap = (void*)*(sys_call_table + __NR_mmap); // store the table's  sys_mmap pointer
-		*(sys_call_table + __NR_mmap) = (unsigned long)custom_mmap; // write the custom_mmap pointer
+		*(sys_call_table + __NR_mmap) = (unsigned long)custom_mmap; // write custom_mmap pointer
 		make_ro((unsigned long)sys_call_table); // make table protected
 		is_set=1; // custom function written!
 		break;
@@ -134,31 +188,46 @@ static struct miscdevice our_device = \
 	&our_fops
 		};
 
-
 static int __init init_mod(void)
 {
 	int retval = misc_register(&our_device); // Register this device with the system
 
 	printk(KERN_INFO "Remote memory Module Successfully Initialized!\n");
 	return retval;    // Note: Non-zero return means that the module couldn't be loaded.
+
+  /* Netlink's main functions */
+  printk("Entering: %s\n",__FUNCTION__);
+  
+  struct netlink_kernel_cfg cfg = {
+      .input = hello_nl_recv_msg,
+  };
+
+  nl_sk = netlink_kernel_create(&init_net, NETLINK_USER, &cfg);
+  
+  if(!nl_sk){
+      printk(KERN_ALERT "Error creating socket.\n");
+      return -10;
+  }
+  
+  return 0;
 }
 
 static void __exit cleanup_mod(void)
 {
 	misc_deregister(&our_device); //Unregister this device with the system
 
-	// check to see if our system call is in use and if it it revert back before exiting (rmmod)
-	if(is_set)
-	{
+	if(is_set){
 		make_rw((unsigned long)sys_call_table);
 		*(sys_call_table + __NR_mmap) = (unsigned long)real_mmap;
 		make_ro((unsigned long)sys_call_table);
 	}
 
 	printk(KERN_INFO "Remote Memory Module Is cleaning up and Exiting...\n");
+
+  /* Netlink Cleanup */
+  printk(KERN_INFO "exiting hello module\n");
+  netlink_kernel_release(nl_sk);
 }
 
-
-// Execute init_mod and cleanup_mod upon loading and unloading the module
 module_init(init_mod);
 module_exit(cleanup_mod);
