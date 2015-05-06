@@ -5,6 +5,9 @@
  * from the kernel
  */
 
+#ifndef NETLINKUSER_C_
+#define NETLINKUSER_C_
+
 #include <sys/socket.h>
 #include <linux/netlink.h>
 #include <unistd.h>
@@ -70,3 +73,5 @@ void captains_log(char delivery[25]){
   else
     printf("Socket Error\n");
 }
+
+#endif

@@ -1,0 +1,1 @@
+cmd_/home/ken/Documents/cmpe142/Project/cmpe_page_mem/src/client/hello.ko := ld -r -m elf_x86_64 -T ./scripts/module-common.lds --build-id  -o /home/ken/Documents/cmpe142/Project/cmpe_page_mem/src/client/hello.ko /home/ken/Documents/cmpe142/Project/cmpe_page_mem/src/client/hello.o /home/ken/Documents/cmpe142/Project/cmpe_page_mem/src/client/hello.mod.o
