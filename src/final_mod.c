@@ -3,8 +3,6 @@
  * <DATE>   05/05/2015
  * <MATTER> Stiching Mason's and Ziyi's modules into one
  * coherent final module that does it all!!!
- *
- * Giving up on shitty fucking Ziyi's code. Document your fucking shit you cunt
  */
 
 #include <linux/module.h>
@@ -28,7 +26,7 @@ MODULE_DESCRIPTION("Remote Memory module for the CMPE 142 Project");
 
 #define NETLINK_USER 31
 
-struct sock *nl_sk = NULL; /* WTF do these values mean, these names suck assholes! */
+struct sock *nl_sk = NULL; /* WTF do these values mean, these names suck! */
 
 static void hello_nl_recv_msg(struct sk_buff *skb) {
   struct nlmsghdr *nlh;
