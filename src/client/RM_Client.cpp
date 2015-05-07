@@ -1,3 +1,10 @@
+/*
+ * <Author> Mason Itkin
+ * <Date> 05/06/2015
+ * <Matter> Client that communicates with kernel module and server
+ */
+
+
 #include <sys/mman.h>
 #include <sys/types.h>
 #include <fcntl.h>
@@ -55,7 +62,8 @@ int main(int argc, char* argv[]) {
 		// OPTION 1: Manually map memory
 		if(opt == 1){
 			if(first_run){
-				cout << "Would you like to specify a start and end address for remote memory? (Y/n)" << endl;
+				cout << "Would you like to specify a start and end \
+                    address for remote memory? (Y/n)" << endl;
 				cin >> ch;
 				if(ch == 'Y' || ch == 'y'){
 					cout << "\nPlease enter a start address (Omitting the '0x')" << endl;
@@ -64,7 +72,8 @@ int main(int argc, char* argv[]) {
 					cout << "\nPlease enter an end address (Omitting the '0x')" << endl;
 					cin >> r_addr_end;
 
-					cout << "\nOk! Using values: "<< hex << r_addr << " through " << hex << r_addr_end << " for Remote Memory" << endl;
+					cout << "\nOk! Using values: "<< hex << r_addr 
+                        << " through " << hex << r_addr_end << " for Remote Memory" << endl;
 				}
 				else
 					cout << "\nUsing default values: " << hex << "0x" << r_addr << " - " << hex << "0x" << r_addr_end << endl;
@@ -87,7 +96,7 @@ int main(int argc, char* argv[]) {
 				printf("Character device failed to open! Device Number: %i\n",device);
 				return 0;
 			}
-			ioctl(device, IOCTL_PATCH_TABLE, r_addr, r_addr_end); // tell the cDriver (kMod) to apply sys_call_table patch
+			ioctl(device, IOCTL_PATCH_TABLE, r_addr, r_addr_end); // tell (kMod) to apply sys_call_table patch
 
 			//Open file
 			fd = open(tmp, O_RDONLY, 0);
@@ -132,10 +141,8 @@ int main(int argc, char* argv[]) {
 			ofile << value << endl;
 			file_send(ip_addr, "value");
 
-
-			ioctl(device, IOCTL_FIX_TABLE); // tell the cDriver (kMod) to remove sys_call_table patch
+			ioctl(device, IOCTL_FIX_TABLE); // tell (kMod) to remove sys_call_table patch
 			close(device);
-
 		}
 		// Sync Time!
 		if(opt == 2){

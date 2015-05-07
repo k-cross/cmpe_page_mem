@@ -1,10 +1,8 @@
-//============================================================================
-// Name        : CMPE_142_RM_Server.cpp
-// Author      : Mason
-// Version     :
-// Copyright   :
-// Description :
-//============================================================================
+/*
+ * <Author> Mason Itkin & Kenneth Cross
+ * <Date> 05/06/2015
+ * <Matter> Server that listens and receives requests from client
+ */
 
 #include <sys/mman.h>
 #include <sys/types.h>
@@ -27,37 +25,28 @@ size_t getFilesize(const char* filename) {
 	return st.st_size;
 }
 
-int main (void){
-
+int main (int argc, char* argv[]){
 	string temp_m, temp_v;
-	int i = 1;
 	ifstream message;
 	ifstream value;
 	ofstream value_out;
-	const char* tmp = "tmp.txt"; // temp file for FD
 	ofstream ofile;
 	size_t filesize;
+	int i = 1;
 	int fd;
 	int rip;
 	int* map;
-	//void* range = (void*)0xaaaaa000;
 	vector<int*> pgs;
-	const string ip_addr = "10.0.0.2"; // Client's IP
+	const char* tmp = "tmp.txt"; 
+	const string ip_addr = argv[1];
 
-	//
-	// Master Server loop
-	// IFSTREAM message -> temp_m
-	// IFSTREAM value	-> temp_v
-	// IFSTREAM value_out
 	while (1 == 1){
-
 		file_recieve();
 		message.open("message");
 		message >> temp_m;
 		message.close();
 
 		if (temp_m == "mem"){
-
 			file_recieve();
 			value.open("value");
 			value >> temp_v;
@@ -74,10 +63,8 @@ int main (void){
 			fd = open(tmp, O_RDONLY, 0);
 			assert(fd != -1);
 
-			//cout << "Range is: " << range << endl;
 			//Execute mmap
 			map = (int*)mmap(NULL, filesize, PROT_READ, MAP_PRIVATE | MAP_POPULATE, fd, 0);
-			//range = (char*)range + filesize;
 
 			//Error Check mmap
 			if (map == MAP_FAILED) {
@@ -85,6 +72,7 @@ int main (void){
 				cout << "Error mmapping the file, please restart!\n";
 				return 0;
 			}
+            
 			assert(map != NULL);
 
 			// Add to vector of Page addresses
@@ -98,16 +86,13 @@ int main (void){
 
 			close(fd);
 			// End MMapping temp_v
-
-
 		}
-		else if (temp_m == "sync"){
 
+		else if (temp_m == "sync"){
 			value_out.open("value_out");
 
 			cout << "Starting Sync to Client..." << endl;
 			for(unsigned int i=0; i<pgs.size(); i++){
-
 				cout << "Syncing page " << i << " Located at: " << pgs[i] << endl;
 				value_out << "Address: " << hex << pgs[i] << " Value: " << pgs[i] << endl;
 
@@ -116,6 +101,7 @@ int main (void){
 				if (rip != 0){
 					cout << "page # " << i << " at " << pgs[i] << " Failed to UNMAP!";
 				}
+
 				assert(rip == 0);
 				close(fd);
 			}
@@ -125,10 +111,8 @@ int main (void){
 
 			cout << "\nSync Complete!" << endl;
 		}
-
-
 	}
-	// Main loop Exited
+    
 	cout << "server will now exit..." << endl;
 	return 0;
 }

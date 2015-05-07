@@ -65,9 +65,6 @@ static void hello_nl_recv_msg(struct sk_buff *skb) {
 
 /* Memory Defined Things */
 
-/* System Call Table address found with:
-grep "sys_call_table" /boot/System.map-3.13.0-51-generic */
-
 unsigned long *sys_call_table = (unsigned long*)0xffffffff81601440; //NOTE! THIS IS SYSTEM SPECIFIC
 
 /* 0: real System call is in use
@@ -97,19 +94,15 @@ asmlinkage long custom_mmap (unsigned long addr, size_t len,
     printk("Intercepted Page Fault from RM_client at: 0x%zx of length: %zx\n", addr, len);
     printk("Redirecting to RM_server through Client...");
 
-		// TODO: Write back the Value to client app
-
 		return 0;
 	}
 	// Otherwise, pass mmap as normal
 	return real_mmap(addr, len, prot, flags, fd, offset);
 }
 
-// This part is to allow us to edit the sys_call_table directly (even though it is protected)
-/* Make the page writable*/
+/* This part is to allow us to edit the sys_call_table directly (even though it is protected) */
 int make_rw(unsigned long address){
 	unsigned int level;
-	// pte_t is Page Table Entry
 	pte_t *pte = lookup_address(address, &level);
 	if(pte->pte &~ _PAGE_RW)
 		pte->pte |= _PAGE_RW;
@@ -124,9 +117,6 @@ int make_ro(unsigned long address){
 	return 0;
 }
 
-/* This function will be invoked each time a user process attempts
-     to open our device. You should keep in mind that the prototype
-    of this function may change along different kernel versions. */
 static int our_open(struct inode *inode, struct file *file){
 	/* We would not like to allow multiple processes to open this device */
 	if(in_use)
@@ -153,9 +143,9 @@ static int our_ioctl(struct file *file, unsigned int cmd,
 	r_addr_end = end_a;
 
   char *godswork = r_addr;
-  msg = godswork; //added
+  msg = godswork; /* added */
 
-	//Implementation of iocrl - To patch __NR_mmap (sys_mmap) in the sys_call_table
+	/* Implementation of iocrl - To patch __NR_mmap (sys_mmap) in the sys_call_table */
 	switch(cmd)
   {
 	case IOCTL_PATCH_TABLE:
@@ -187,6 +177,7 @@ static const struct file_operations our_fops =\
   .unlocked_ioctl = (void*)&our_ioctl,
   .compat_ioctl = (void*)&our_ioctl
 };
+
 static struct miscdevice our_device = \
 {
   MISC_DYNAMIC_MINOR,
@@ -195,17 +186,15 @@ static struct miscdevice our_device = \
 };
 
 static int __init init_mod(void){
-	int retval = misc_register(&our_device); // Register device with system
+	int retval = misc_register(&our_device); /* Register device with system */
 
 	printk(KERN_INFO "Remote memory Module Successfully Initialized!\n");
   if(retval < 0)
-	    return retval; /* Note: Non-zero return means module couldn't be loaded. MOD */
+	    return retval; /* Non-zero return = fail */
 
   /* Netlink's main functions */
   printk("Entering: %s\n",__FUNCTION__);
-  
   struct netlink_kernel_cfg cfg = { .input = hello_nl_recv_msg, };
-
   nl_sk = netlink_kernel_create(&init_net, NETLINK_USER, &cfg);
   
   if(!nl_sk){

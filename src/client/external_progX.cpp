@@ -1,3 +1,10 @@
+/*
+ * <Author> Kenneth Cross
+ * <Date> 05/06/2015
+ * <Matter> This is an example of calling a commandline util
+ * in C++, needed because C won't compile natively with boost TCP
+ */
+
 #include <iostream>
 #include <fstream>
 #include <string>
