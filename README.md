@@ -1,5 +1,15 @@
 # Networked Paging Kernel Module
-Kernel module that creates memory pages that are mapped to a networked computer.
+
+##About
+Kernel module and C++ application that can read and write paged memory from a host machine to a remote machine over a network connection
+
+###Implementation
+This kernel module and C++ application complete the following actions to allow for pages in memory to mapped over the network:
+- Userspace to kernel space communication
+- System call hooking and redefinition (system call: PagFault)
+- Two way communication and data transfer over a TCP socket
+
+All code was written in C++ using additional librarys provided by Ubuntu 14 (Kernel and System Calls) and Boost (TCP sockets)
 
 ## Compile Instructions
 * For compiling either the client or server, go to respective directory and type **make**.
